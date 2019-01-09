@@ -7,6 +7,20 @@ import bcrypt from 'bcryptjs';
 import CryptoJS from 'crypto-js';
 import JSEncrypt from 'jsencrypt';
 
+function getRandomValues(buf) {
+  if (window.crypto && window.crypto.getRandomValues) {
+      return window.crypto.getRandomValues(buf);
+  }
+  if (window.msCrypto && window.msCrypto.getRandomValues) {
+      return window.msCrypto.getRandomValues(buf);
+  }
+  throw new Error('No cryptographic randomness!');
+}
+
+function generateRandomKey() {
+  return window.btoa(String.fromCharCode.apply(null, getRandomValues(new Uint8Array(16)))).trim();
+}
+
 const crypt = new JSEncrypt({ default_key_size: 2056 })
 const rsa = {
   encrypt: (text, publicKey) => {
@@ -142,7 +156,7 @@ class Client {
   }
 
   encryptMessage(content, pubKey) {
-    const messageKey = Date.now() + ''; // TODO: true random stuff;
+    const messageKey = generateRandomKey();
     const encryptedContent = aes.encrypt(content, messageKey);
     const encryptedKey = rsa.encrypt(messageKey, pubKey || this.publicKey);
     return {
