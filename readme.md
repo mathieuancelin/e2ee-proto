@@ -1,6 +1,6 @@
 # E2EE messages
 
-A prototype of E2EE messages app to explore E2EE. 
+A prototype of E2EE messaging app to explore E2EE techniques. 
 Uses in browser crypto to encrypt and decrypt messages client side using users RSA private key.
 Private key is generated client side and saved server side encrypted with user password using AES 256.
 Everything server side is encrypted 
