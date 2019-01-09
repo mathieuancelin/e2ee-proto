@@ -179,6 +179,7 @@ class Client {
         encryptedMessage.from = this.email;
         encryptedMessage.to = to;
         encryptedMessage.at = Date.now();
+        encryptedMessage.id = generateRandomKey();
         if (to === this.email) {
           return this.server.sendMessage(this.email, encryptedMessage);
         } else {
@@ -186,6 +187,7 @@ class Client {
           selfEncryptedMessage.from = this.email;
           selfEncryptedMessage.to = to;
           selfEncryptedMessage.at = encryptedMessage.at;
+          selfEncryptedMessage.id = encryptedMessage.id;
           return this.server.sendMessage(this.email, encryptedMessage, selfEncryptedMessage);
         }
       } else {
@@ -274,15 +276,15 @@ class App extends Component {
   renderMessages = () => {
     return _.reverse(_.sortBy(this.state.messages, m => m.at)).map(message => {
       return (
-        <div className="card mb-4 shadow-sm">
-            <div className="card-body">
-              <p className="card-text" style={{ fontWeight: 'bold' }}>{message.from} - {message.to}</p>
-              <p className="card-text">{message.content}</p>
-              <div className="d-flex justify-content-end align-items-center" style={{ width: '100%' }}>
-                <small className="text-muted">{moment(message.at).format('DD/MM/YYYY HH:mm:ss')}</small>
-              </div>
+        <div key={message.id || message.at} className="card mb-4 shadow-sm">
+          <div className="card-body">
+            <p className="card-text" style={{ fontWeight: 'bold' }}>{message.from} - {message.to}</p>
+            <p className="card-text">{message.content}</p>
+            <div className="d-flex justify-content-end align-items-center" style={{ width: '100%' }}>
+              <small className="text-muted">{moment(message.at).format('DD/MM/YYYY HH:mm:ss')}</small>
             </div>
           </div>
+        </div>
       );
     });
   }
@@ -309,7 +311,7 @@ class App extends Component {
               <div className="container">
                 <h2 className="jumbotron-heading">Send message</h2>
                 <select className="form-control" onChange={e => this.setState({ to: e.target.value})} value={this.state.to}>
-                  {[<option value="--"></option>].concat(this.state.contacts.map(c => <option value={c.email}>{c.name}</option>))}
+                  {[<option value="--"></option>].concat(this.state.contacts.map(c => <option key={c.email} value={c.email}>{c.name}</option>))}
                 </select>
                 <textarea style={{ marginTop: 5 }} className="form-control" value={this.state.content} onChange={e => this.setState({ content: e.target.value})} rows="3"></textarea>
                 <p>
